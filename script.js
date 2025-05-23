@@ -7,6 +7,12 @@ let kanbanTasks = [];
 // Global variable to store the ID of the dragged item
 let draggedItemId = null;
 
+// Sprint Management Variables
+let sprintStartDate = null;
+let totalSprintTasks = 0;
+const sprintDays = 10; // Fixed duration for MVP
+let burndownData = []; // To store [day, remainingTasks]
+
 // Function to render backlog items to the DOM
 function renderBacklog() {
     const backlogContainer = document.getElementById('backlog-items-container');
@@ -200,10 +206,323 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 console.log('Kanban tasks:', kanbanTasks); // For verification
+                // Check if sprint is active and if the drop affects completion status to update chart
+                if (sprintStartDate) {
+                    const taskJustChanged = kanbanTasks.find(task => task.id === draggedElementId);
+                    if (taskJustChanged) { // if it's a kanban task
+                         renderBurndownChart();
+                    } else if (draggedElementId.startsWith('backlog-item-')) { // if it's a new item from backlog
+                         renderBurndownChart();
+                    }
+                }
             }
             draggedItemId = null; // Clear after drop
         });
     });
 
     renderBacklog(); // Initial render of the backlog
+
+    // "Start Sprint" button event listener
+    const startSprintBtn = document.getElementById('start-sprint-btn');
+    if (startSprintBtn) {
+        startSprintBtn.addEventListener('click', () => {
+            if (sprintStartDate) {
+                if (!confirm("A sprint is already in progress. Do you want to restart it with the current board tasks?")) {
+                    return;
+                }
+            }
+            sprintStartDate = new Date();
+            totalSprintTasks = kanbanTasks.filter(task => task.status !== 'done').length; // Count only non-done tasks at sprint start
+            
+            // If all tasks are already in "Done", effectively 0 tasks for burndown.
+            if (kanbanTasks.length > 0 && totalSprintTasks === 0) {
+                 console.log("Sprint starting with all tasks already in 'Done'. Burndown will reflect this.");
+            } else if (kanbanTasks.length === 0){ // No tasks on board at all
+                alert("Cannot start a sprint with no tasks on the Kanban board.");
+                sprintStartDate = null; 
+                return;
+            }
+            
+            console.log(`Sprint started on ${sprintStartDate} with ${totalSprintTasks} active tasks.`);
+            renderBurndownChart(); // This will now correctly use the filtered totalSprintTasks
+            startSprintBtn.disabled = true;
+            startSprintBtn.textContent = "Sprint in Progress";
+        });
+    } else {
+        console.error("Start Sprint button not found!");
+    }
+
+    renderBurndownChart(); // Initial render of chart (will show "Sprint not started" or current state)
+
+    // --- Tooltip/Tip Functionality ---
+    const tipTriggers = document.querySelectorAll('.tip-trigger');
+    const tooltipContents = document.querySelectorAll('.tooltip-content');
+
+    tipTriggers.forEach(trigger => {
+        trigger.addEventListener('click', (event) => {
+            event.stopPropagation(); 
+
+            const targetId = trigger.id.replace('-trigger', '-content');
+            const targetTooltip = document.getElementById(targetId);
+
+            // Hide all other tooltips
+            tooltipContents.forEach(tip => {
+                if (tip.id !== targetId) {
+                    tip.style.display = 'none';
+                }
+            });
+
+            // Toggle current tooltip
+            if (targetTooltip) {
+                const isVisible = targetTooltip.style.display === 'block';
+                targetTooltip.style.display = isVisible ? 'none' : 'block';
+
+                if (targetTooltip.style.display === 'block' && targetTooltip.style.position === 'absolute') {
+                    const triggerRect = trigger.getBoundingClientRect();
+                    const bodyRect = document.body.getBoundingClientRect();
+                    
+                    // Position below the trigger
+                    let top = triggerRect.bottom - bodyRect.top + window.scrollY + 5;
+                    let left = triggerRect.left - bodyRect.left + window.scrollX;
+
+                    // Basic boundary detection (right edge)
+                    if (left + targetTooltip.offsetWidth > bodyRect.width) {
+                        left = bodyRect.width - targetTooltip.offsetWidth - 5; // 5px padding from edge
+                    }
+                     // Basic boundary detection (left edge)
+                    if (left < 0) {
+                        left = 5; // 5px padding from edge
+                    }
+
+                    targetTooltip.style.left = `${left}px`;
+                    targetTooltip.style.top = `${top}px`;
+                }
+            }
+        });
+    });
+
+    // Click anywhere else to close tooltips
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.tip-trigger') && !event.target.closest('.tooltip-content')) {
+            tooltipContents.forEach(tip => {
+                tip.style.display = 'none';
+            });
+        }
+    });
 });
+
+// Function to render the Sprint Burndown Chart
+function renderBurndownChart() {
+    const chartContainer = document.getElementById('burndown-chart-container');
+    if (!chartContainer) {
+        console.error('Burndown chart container not found!');
+        return;
+    }
+    chartContainer.innerHTML = ''; // Clear previous chart
+
+    if (!sprintStartDate) {
+        chartContainer.innerHTML = '<p>Sprint not started. Click "Start Sprint" to begin.</p>';
+        // Enable the button if it was disabled
+        const startSprintBtn = document.getElementById('start-sprint-btn');
+        if (startSprintBtn) {
+            startSprintBtn.disabled = false;
+            startSprintBtn.textContent = "Start Sprint";
+        }
+        return;
+    }
+
+    // --- SVG Chart Rendering ---
+    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const containerWidth = chartContainer.clientWidth;
+    const containerHeight = chartContainer.clientHeight;
+    const width = containerWidth - margin.left - margin.right;
+    const height = containerHeight - margin.top - margin.bottom;
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', containerWidth);
+    svg.setAttribute('height', containerHeight);
+    
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('transform', `translate(${margin.left},${margin.top})`);
+    svg.appendChild(g);
+
+    // --- Data Calculation ---
+    // Ideal Line Data
+    const idealData = [];
+    if (totalSprintTasks > 0) { // Only calculate if there are tasks
+        for (let i = 0; i <= sprintDays; i++) {
+            idealData.push({ day: i, tasks: totalSprintTasks - (totalSprintTasks / sprintDays) * i });
+        }
+    } else { // No tasks, ideal line is flat at 0
+        for (let i = 0; i <= sprintDays; i++) {
+            idealData.push({ day: i, tasks: 0 });
+        }
+    }
+
+    // Actual Burndown Data
+    const actualData = [];
+    const today = new Date();
+    const elapsedDaysFull = Math.max(0, (today - sprintStartDate) / (1000 * 60 * 60 * 24));
+
+    for (let i = 0; i <= sprintDays; i++) {
+        let remainingTasks = totalSprintTasks;
+        if (i > elapsedDaysFull + 1 && i <= sprintDays) { // For future days, show last known or project from ideal
+             // actualData.push({ day: i, tasks: actualData[actualData.length-1]?.tasks }); // Plateau
+            // For simplicity in MVP, let's not project into future for actual line, just plot what we know
+            // Or, we can stop plotting actual data if i > current day in sprint
+             if (i > Math.floor(elapsedDaysFull) +1 ) continue; // Stop if day 'i' is beyond today + 1
+        }
+
+        const dayDate = new Date(sprintStartDate);
+        dayDate.setDate(sprintStartDate.getDate() + i);
+
+        let tasksCompletedByDayI = 0;
+        kanbanTasks.forEach(task => {
+            if (task.completedAt) {
+                const completedDate = new Date(task.completedAt);
+                // Normalize dates to compare day only
+                const normCompletedDate = new Date(completedDate.getFullYear(), completedDate.getMonth(), completedDate.getDate());
+                const normDayDate = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate());
+                if (normCompletedDate <= normDayDate) {
+                    tasksCompletedByDayI++;
+                }
+            }
+        });
+        remainingTasks = totalSprintTasks - tasksCompletedByDayI;
+        actualData.push({ day: i, tasks: remainingTasks });
+    }
+     // Ensure the first point of actual data is always [0, totalSprintTasks]
+    if (!actualData.find(d => d.day === 0)) {
+        actualData.unshift({ day: 0, tasks: totalSprintTasks });
+    } else {
+        actualData.find(d => d.day === 0).tasks = totalSprintTasks;
+    }
+
+
+    // --- Scales ---
+    const xScale = (day) => (width / sprintDays) * day;
+    // Adjust yScale to handle totalSprintTasks = 0 gracefully
+    const yScale = (tasks) => {
+        if (totalSprintTasks === 0) {
+            return height; // All points will be at the bottom of the chart (0 tasks)
+        }
+        return height - (height / totalSprintTasks) * tasks;
+    };
+
+    // --- Axes ---
+    // X Axis (Days)
+    const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    xAxis.setAttribute('x1', 0);
+    xAxis.setAttribute('y1', height);
+    xAxis.setAttribute('x2', width);
+    xAxis.setAttribute('y2', height);
+    xAxis.setAttribute('stroke', '#333');
+    g.appendChild(xAxis);
+
+    for (let i = 0; i <= sprintDays; i++) {
+        const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        tick.setAttribute('x1', xScale(i));
+        tick.setAttribute('y1', height);
+        tick.setAttribute('x2', xScale(i));
+        tick.setAttribute('y2', height + 5);
+        tick.setAttribute('stroke', '#333');
+        g.appendChild(tick);
+
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', xScale(i));
+        label.setAttribute('y', height + 20);
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('font-size', '10px');
+        label.textContent = i;
+        g.appendChild(label);
+    }
+    const xAxisLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    xAxisLabel.setAttribute('x', width / 2);
+    xAxisLabel.setAttribute('y', height + 35);
+    xAxisLabel.setAttribute('text-anchor', 'middle');
+    xAxisLabel.textContent = 'Days';
+    g.appendChild(xAxisLabel);
+
+    // Y Axis (Tasks Remaining)
+    const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    yAxis.setAttribute('x1', 0);
+    yAxis.setAttribute('y1', 0);
+    yAxis.setAttribute('x2', 0);
+    yAxis.setAttribute('y2', height);
+    yAxis.setAttribute('stroke', '#333');
+    g.appendChild(yAxis);
+
+    for (let i = 0; i <= totalSprintTasks; i += Math.ceil(totalSprintTasks / 10) || 1) { // Adjust step for readability
+        const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        tick.setAttribute('x1', -5);
+        tick.setAttribute('y1', yScale(i));
+        tick.setAttribute('x2', 0);
+        tick.setAttribute('y2', yScale(i));
+        tick.setAttribute('stroke', '#333');
+        g.appendChild(tick);
+
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', -10);
+        label.setAttribute('y', yScale(i) + 3); // Adjust for alignment
+        label.setAttribute('text-anchor', 'end');
+        label.setAttribute('font-size', '10px');
+        label.textContent = i;
+        g.appendChild(label);
+    }
+    const yAxisLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    yAxisLabel.setAttribute('transform', 'rotate(-90)');
+    yAxisLabel.setAttribute('x', -height / 2);
+    yAxisLabel.setAttribute('y', -margin.left + 15);
+    yAxisLabel.setAttribute('text-anchor', 'middle');
+    yAxisLabel.textContent = 'Tasks Remaining';
+    g.appendChild(yAxisLabel);
+
+    // --- Plot Lines ---
+    // Ideal Line
+    if (idealData.length > 0) {
+        const idealLine = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        const idealPoints = idealData.map(d => `${xScale(d.day)},${yScale(d.tasks)}`).join(' ');
+        idealLine.setAttribute('points', idealPoints);
+        idealLine.setAttribute('stroke', 'grey');
+        idealLine.setAttribute('stroke-dasharray', '4');
+        idealLine.setAttribute('fill', 'none');
+        idealLine.setAttribute('stroke-width', '2');
+        g.appendChild(idealLine);
+    }
+    
+    // Actual Line
+    if (actualData.length > 1) { // Need at least 2 points to draw a line
+        const actualLine = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        const actualPoints = actualData.map(d => `${xScale(d.day)},${yScale(d.tasks)}`).join(' ');
+        actualLine.setAttribute('points', actualPoints);
+        actualLine.setAttribute('stroke', 'blue');
+        actualLine.setAttribute('fill', 'none');
+        actualLine.setAttribute('stroke-width', '2');
+        g.appendChild(actualLine);
+    } else if (actualData.length === 1) { // Draw a point if only one data point
+        const point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        point.setAttribute('cx', xScale(actualData[0].day));
+        point.setAttribute('cy', yScale(actualData[0].tasks));
+        point.setAttribute('r', 3);
+        point.setAttribute('fill', 'blue');
+        g.appendChild(point);
+    } else if (totalSprintTasks === 0 && actualData.length === 0) { // Special case: sprint started with 0 tasks
+        const point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        point.setAttribute('cx', xScale(0));
+        point.setAttribute('cy', yScale(0));
+        point.setAttribute('r', 3);
+        point.setAttribute('fill', 'blue');
+        g.appendChild(point);
+        const noTasksText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        noTasksText.setAttribute('x', width / 2);
+        noTasksText.setAttribute('y', height / 2);
+        noTasksText.setAttribute('text-anchor', 'middle');
+        noTasksText.setAttribute('font-size', '14px');
+        noTasksText.textContent = "Sprint started with 0 active tasks.";
+        g.appendChild(noTasksText);
+    }
+    
+    chartContainer.appendChild(svg);
+}
+// This SEARCH block was part of the original diff but is now handled by the block above.
+// It's removed here to prevent tool errors.

@@ -34,7 +34,10 @@
         <section id="product-backlog">
             <h2>Product Backlog</h2>
             <form id="add-backlog-item-form">
-                <h3>Add New Backlog Item</h3>
+                <h3>Add New Backlog Item <span class="tip-trigger" id="tip-backlog-trigger">(?)</span></h3>
+                <div class="tooltip-content" id="tip-backlog-content">
+                    <p>New tasks or user stories start here. Fill in the details and add them to your Product Backlog.</p>
+                </div>
                 <div>
                     <label for="backlog-item-name">Item Name:</label>
                     <input type="text" id="backlog-item-name" name="backlog-item-name" required>
@@ -51,7 +54,16 @@
         </section>
 
         <section id="kanban-section">
-            <h2>Kanban Board</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Kanban Board <span class="tip-trigger" id="tip-kanban-trigger">(?)</span></h2>
+                <button id="start-sprint-btn">Start Sprint <span class="tip-trigger" id="tip-sprint-trigger">(?)</span></button>
+            </div>
+            <div class="tooltip-content" id="tip-kanban-content">
+                <p>Drag items from the backlog to 'To Do'. Move tasks through 'In Progress' to 'Done' as you work on them. Completing tasks updates the Burndown Chart.</p>
+            </div>
+            <div class="tooltip-content" id="tip-sprint-content">
+                <p>Once you have items in your backlog and are ready to begin work, drag them to the Kanban board and then start the sprint to track progress.</p>
+            </div>
             <div id="kanban-board">
                 <div class="kanban-column" id="todo-column">
                     <h3>To Do</h3>
