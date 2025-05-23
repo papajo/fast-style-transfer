@@ -1,0 +1,342 @@
+/* Global styles */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Header styles */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+/* Main content styles */
+main {
+    flex: 1; /* Allows main to grow and fill available space */
+    padding: 1rem;
+    max-width: 800px; /* Max width for content */
+    margin: 0 auto; /* Center content */
+    background-color: #fff;
+}
+
+/* Footer styles */
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1rem 0;
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    main {
+        padding: 0.5rem;
+    }
+
+    header, footer {
+        padding: 0.5rem 0;
+    }
+}
+
+/* Form styles */
+#project-creation-form {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#project-creation-form h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+#project-creation-form form div {
+    margin-bottom: 1rem;
+}
+
+#project-creation-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: bold;
+}
+
+#project-creation-form input[type="text"],
+#project-creation-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensures padding doesn't affect overall width */
+    font-size: 1rem;
+}
+
+#project-creation-form textarea {
+    resize: vertical; /* Allow vertical resize, disable horizontal */
+}
+
+#project-creation-form button[type="submit"] {
+    background-color: #5cb85c;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: block;
+    width: 100%; /* Make button full width */
+    margin-top: 1rem;
+}
+
+#project-creation-form button[type="submit"]:hover {
+    background-color: #4cae4c;
+}
+
+/* Product Backlog styles */
+#product-backlog {
+    margin-top: 2rem; /* Add some space above the backlog section */
+    padding: 1.5rem;
+    background-color: #f9f9f9; /* Slightly different background for distinction */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#product-backlog h2 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #eee; /* Add a subtle separator line */
+    padding-bottom: 0.5rem;
+}
+
+#backlog-items-container {
+    min-height: 100px; /* Minimum height to make it visible even when empty */
+    border: 1px dashed #ddd; /* Dashed border to indicate a dynamic content area */
+    padding: 1rem;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+/* Add Backlog Item Form styles */
+#add-backlog-item-form {
+    margin-bottom: 2rem; /* Space below the form before the item list */
+    padding: 1.5rem;
+    background-color: #eef; /* Slightly different background to distinguish */
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+#add-backlog-item-form h3 {
+    text-align: center;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+#add-backlog-item-form div {
+    margin-bottom: 0.75rem;
+}
+
+#add-backlog-item-form label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #444;
+    font-weight: bold;
+}
+
+#add-backlog-item-form input[type="text"],
+#add-backlog-item-form textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+}
+
+#add-backlog-item-form textarea {
+    resize: vertical;
+}
+
+#add-backlog-item-form button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+#add-backlog-item-form button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Individual backlog item styling */
+.backlog-item {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.backlog-item h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #007bff;
+}
+
+.backlog-item p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.backlog-item .delete-item-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right; /* Position to the right */
+}
+
+.backlog-item .delete-item-btn:hover {
+    background-color: #c82333;
+}
+
+/* Kanban Board Section */
+#kanban-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f0f8ff; /* Light AliceBlue for distinction */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#kanban-section h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #ddeeff;
+    padding-bottom: 0.5rem;
+}
+
+#kanban-board {
+    display: flex;
+    justify-content: space-between; /* Distribute columns evenly */
+    gap: 1rem; /* Space between columns */
+    min-height: 300px; /* Minimum height for the board */
+}
+
+.kanban-column {
+    flex: 1; /* Each column takes equal width */
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 1rem;
+    display: flex; /* Use flexbox for column layout */
+    flex-direction: column; /* Stack heading and tasks vertically */
+}
+
+.kanban-column h3 {
+    text-align: center;
+    color: #007bff;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.tasks-container {
+    background-color: #f9f9f9; /* Slightly different bg for task area */
+    border-radius: 4px;
+    padding: 0.5rem;
+    min-height: 200px; /* Ensure visibility when empty */
+    flex-grow: 1; /* Allow task container to grow */
+    overflow-y: auto; /* Add scroll if tasks overflow */
+}
+
+/* Styling for individual tasks/cards (placeholder for now) */
+.task-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    cursor: grab; /* Indicate draggable items */
+}
+
+.task-card h4 {
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.task-card p {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 0;
+}
+
+/* Burndown Chart Section */
+#burndown-chart-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa; /* Light background for the section */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#burndown-chart-section h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+}
+
+#burndown-chart-container {
+    width: 100%;
+    height: 300px; /* Defined height */
+    background-color: #ffffff; /* White background for the chart area */
+    border: 1px solid #dee2e6; /* Light border */
+    border-radius: 4px;
+    display: flex; /* Optional: for centering placeholder text */
+    align-items: center; /* Optional: for centering placeholder text */
+    justify-content: center; /* Optional: for centering placeholder text */
+    color: #6c757d; /* Optional: placeholder text color */
+    font-style: italic; /* Optional: placeholder text style */
+}
+
+/* Drag and Drop Styles */
+.backlog-item.dragging, .task-card.dragging {
+    opacity: 0.5;
+    border: 2px dashed #007bff;
+}
+
+.tasks-container.drag-over {
+    background-color: #e9ecef; /* Light grey to indicate drop target */
+    border: 2px dashed #007bff; /* Blue dashed border */
+}

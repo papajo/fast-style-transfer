@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Story</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <!-- Header content will go here -->
+    </header>
+
+    <main>
+        <section id="project-creation-form">
+            <h2>Create New Project</h2>
+            <form>
+                <div>
+                    <label for="project-name">Project Name:</label>
+                    <input type="text" id="project-name" name="project-name" required>
+                </div>
+                <div>
+                    <label for="project-description">Project Description:</label>
+                    <textarea id="project-description" name="project-description" rows="4" required></textarea>
+                </div>
+                <div>
+                    <label for="project-goals">Project Goals:</label>
+                    <textarea id="project-goals" name="project-goals" rows="4" required></textarea>
+                </div>
+                <button type="submit">Create Project</button>
+            </form>
+        </section>
+
+        <section id="product-backlog">
+            <h2>Product Backlog</h2>
+            <form id="add-backlog-item-form">
+                <h3>Add New Backlog Item</h3>
+                <div>
+                    <label for="backlog-item-name">Item Name:</label>
+                    <input type="text" id="backlog-item-name" name="backlog-item-name" required>
+                </div>
+                <div>
+                    <label for="backlog-item-description">Item Description:</label>
+                    <textarea id="backlog-item-description" name="backlog-item-description" rows="3" required></textarea>
+                </div>
+                <button type="submit">Add to Backlog</button>
+            </form>
+            <div id="backlog-items-container">
+                <!-- Backlog items will be dynamically added here -->
+            </div>
+        </section>
+
+        <section id="kanban-section">
+            <h2>Kanban Board</h2>
+            <div id="kanban-board">
+                <div class="kanban-column" id="todo-column">
+                    <h3>To Do</h3>
+                    <div class="tasks-container" id="todo-tasks">
+                        <!-- Tasks will be added here -->
+                    </div>
+                </div>
+                <div class="kanban-column" id="inprogress-column">
+                    <h3>In Progress</h3>
+                    <div class="tasks-container" id="inprogress-tasks">
+                        <!-- Tasks will be added here -->
+                    </div>
+                </div>
+                <div class="kanban-column" id="done-column">
+                    <h3>Done</h3>
+                    <div class="tasks-container" id="done-tasks">
+                        <!-- Tasks will be added here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="burndown-chart-section">
+            <h2>Sprint Burndown Chart</h2>
+            <div id="burndown-chart-container">
+                <!-- Chart will be rendered here by a library -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <!-- Footer content will go here -->
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
