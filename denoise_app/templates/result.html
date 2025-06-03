@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denoising Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>Denoising Result</h1>
+
+    <div class="result-container">
+        <div class="image-display-area">
+            <div class="image-item">
+                <h2>Original Image</h2>
+                <img src="{{ original_image_url }}" alt="Original Image">
+            </div>
+            <div class="image-item">
+                <h2>Denoised Image</h2>
+                <img src="{{ denoised_image_url }}" alt="Denoised Image">
+            </div>
+        </div>
+    </div>
+
+    <a href="/">Upload another image</a>
+</div>
+</body>
+</html>

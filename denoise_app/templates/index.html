@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Denoising App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>Image Denoising App</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="image">Choose an image to denoise:</label><br><br>
+        <input type="file" id="image" name="image" accept="image/*" required>
+        <input type="submit" value="Upload and Denoise">
+    </form>
+</div>
+</body>
+</html>
